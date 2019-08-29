@@ -28,7 +28,7 @@ Bet.createBet = function(newBet, result) {
 Bet.getBetById = function(betId, result) {
     sql.query('SELECT * from bets WHERE id = ?', betId, (err, res) => {
         if(err) {
-            console.log("error: ", err);
+            console.log('error: ', err);
             result(err, null);
         }
         else {
@@ -41,8 +41,8 @@ Bet.getBetById = function(betId, result) {
 Bet.getAllBets = function(result) {
     sql.query('SELECT * FROM bets', (err, res) => {
         if(err) {
-            console.log("error: ", err);
-            result(null, err);
+            console.log('error: ', err);
+            result(err, null);
         }
         else {
             result(null, res);
@@ -50,10 +50,22 @@ Bet.getAllBets = function(result) {
     });
 }
 
+Bet.getUserBets = function(userId, result) {
+    sql.query('SELECT * FROM bets WHERE user_id = ?', userId, (err, res) => {
+        if(err) {
+            console.log('error: ' + err);
+            result(err, null);
+        }
+        else {
+            result(null, res);
+        }
+    })
+}
+
 Bet.updateById = function(id, isComplete, result) {
     sql.query('UPDATE bets SET is_complete = ? WHERE id = ?', [isComplete, id], (err, res) => {
         if(err) {
-            console.log("error: ", err);
+            console.log('error: ', err);
             result(null, err);
         }
         else {   
@@ -65,7 +77,7 @@ Bet.updateById = function(id, isComplete, result) {
 Bet.remove = function(id, result) {
     sql.query('DELETE FROM bets WHERE id = ?', id, (err, res) => {
         if(err) {
-            console.log("error: ", err);
+            console.log('error: ', err);
             result(null, err);
         }
         else {
