@@ -14,7 +14,7 @@ module.exports = (app) => {
         }),
 
         // Validate the audience and the issuer.
-        audience: '9Fc1weW01pK6YGiZkBaRIwHbeCFGQ5cS',
+        audience: '',
         issuer: `https://dev-pkxcyl-c.auth0.com/`,
         algorithms: ['RS256']
     })
