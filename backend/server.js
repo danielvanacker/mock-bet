@@ -1,8 +1,15 @@
 const express = require('express');
 const mySQL = require('mysql');
-var app = express();
-var port = process.env.PORT || 3000;
 var bodyParser = require('body-parser');
+const cors = require('cors');
+const helmet = require('helmet');
+
+const port = process.env.PORT || 3000;
+
+var app = express();
+
+app.use(cors());
+app.use(helmet());
 
 app.listen(port, () => {
     console.log('Express app listening on port ' + port);
