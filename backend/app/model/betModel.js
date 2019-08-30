@@ -1,9 +1,5 @@
 'user strict';
 var sql = require('./db.js');
-sql.connect((err) => {
-    console.log('Connected!');
-    if (err) throw err;
-});
 
 // Bet object contructor
 var Bet = function(bet) {

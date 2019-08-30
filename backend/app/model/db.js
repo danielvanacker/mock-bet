@@ -10,4 +10,9 @@ var connection = mysql.createConnection({
     database: 'mockbetdb'
 });
 
+connection.connect((err) => {
+    console.log('Connected!');
+    if (err) throw err;
+});
+
 module.exports = connection;

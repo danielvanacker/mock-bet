@@ -32,11 +32,11 @@ exports.create_a_bet = (req, res) => {
         res.status(400).send({ error: true, message: 'Please provide league and user id.'});
     }
     else {
-        Bet.createBet(newBet, (err, bet) => {
+        Bet.createBet(newBet, (err, betId) => {
             if (err) {
                 res.send(err);
             }
-            res.json(bet);
+            res.json(betId);
         })
     }
 };
