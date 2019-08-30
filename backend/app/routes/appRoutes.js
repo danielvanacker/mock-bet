@@ -4,7 +4,7 @@ const jwksRsa = require('jwks-rsa');
 
 module.exports = (app) => {
     var bets = require('../controller/betsController');
-    var mlbGames = require('../controller/mlbScoreController');
+    var mlbGames = require('../controller/mlbController');
 
     const checkJwt = jwt({
         secret: jwksRsa.expressJwtSecret({
@@ -37,6 +37,6 @@ module.exports = (app) => {
         .get(mlbGames.list_all_games);
 
     app.route('/mlb/games')
-        .get(checkJwt, mlbGames.list_games_by_date)
+        .get(mlbGames.list_games_by_date)
         .post(checkJwt, mlbGames.create_a_game);
 };

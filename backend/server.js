@@ -1,5 +1,4 @@
 const express = require('express');
-const mySQL = require('mysql');
 var bodyParser = require('body-parser');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -20,3 +19,8 @@ app.use(bodyParser.json());
 
 var routes = require('./app/routes/appRoutes');
 routes(app);
+
+// const scraper = require('./app/scrapers/mlbScheduleScraper');
+// scraper('2019-10-02').then(function(gameList) {
+//     console.log(gameList)
+// });

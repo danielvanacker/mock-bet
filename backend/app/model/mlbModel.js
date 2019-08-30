@@ -1,13 +1,13 @@
 'user strict';
 var sql = require('./db.js');
 
-// Bet object contructor
+// Mlb object contructor
 var Mlb = function(game) {
-    this.start_date = '2019-01-01'; //TODO insert scraped date
+    this.start_date = game.start_date; //TODO insert scraped date
     this.home = game.home;
     this.away = game.away;
-    this.home_runs = game.home_runs;
-    this.away_runs = game.away_runs;
+    this.home_runs = 0;
+    this.away_runs = 0;
     this.is_complete = 0;
 };
 
