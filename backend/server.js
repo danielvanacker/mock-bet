@@ -20,7 +20,18 @@ app.use(bodyParser.json());
 var routes = require('./app/routes/appRoutes');
 routes(app);
 
-// const scraper = require('./app/scrapers/mlbScheduleScraper');
-// scraper('2019-10-02').then(function(gameList) {
-//     console.log(gameList)
+const scraper = require('./app/scrapers/mlbScheduleScraper');
+scraper('2019-09-15').then(function(gameList) {
+    console.log(gameList)
+});
+
+// const mlbTeam = require('./app/model/mlbTeamModel')
+// mlbTeam.getTeamByCbsName('Philadelphia', (err, team) => {
+//     if (err) {
+//         console.log(err);
+//         return; // TODO handle errror
+//     }
+//     else {
+//         console.log(team[0].id)
+//     }
 // });
