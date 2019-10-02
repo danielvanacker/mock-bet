@@ -1,6 +1,9 @@
 'use strict';
+require("dotenv").config();
+
 const jwt = require('express-jwt');
 const jwksRsa = require('jwks-rsa');
+const audience = process.env.AUDIENCE;
 
 module.exports = (app) => {
     var bets = require('../controller/betsController');
@@ -15,7 +18,7 @@ module.exports = (app) => {
         }),
 
         // Validate the audience and the issuer.
-        audience: '',
+        audience: audience,
         issuer: `https://dev-pkxcyl-c.auth0.com/`,
         algorithms: ['RS256']
     })
@@ -37,6 +40,6 @@ module.exports = (app) => {
         .get(mlbGames.list_all_games);
 
     app.route('/mlb/games')
-        .get(mlbGames.list_games_by_date)
+        .get(checkJwt, mlbGames.list_games_by_date)
         .post(checkJwt, mlbGames.create_a_game);
 };

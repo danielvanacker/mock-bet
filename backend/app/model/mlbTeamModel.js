@@ -10,7 +10,8 @@ var MlbTeam = function(mlbTeam) {
     this.team_name = mlbTeam.team_name;
 };
 
-MlbTeam.getTeamByCbsName = function(cbs_schedule_name, result) {
+// Returns the MLB team (team[0] based on their CBS team name
+MlbTeam.getTeamByCbsName = async function(cbs_schedule_name, result) {
     sql.query('SELECT * FROM mlb_teams WHERE cbs_schedule_name = ?', cbs_schedule_name, (err, res) => {
         if(err) {
             console.log('error: ', err);
@@ -22,6 +23,7 @@ MlbTeam.getTeamByCbsName = function(cbs_schedule_name, result) {
     });
 };
 
+// Returns the MLB team (team[0]) based on their CBS schedule abbreviation
 MlbTeam.getTeamByCbsAbrev = function(cbs_schedule_abrev, result) {
     sql.query('SELECT * FROM mlb_teams WHERE cbs_schedule_abrev = ?', cbs_schedule_abrev, (err, res) => {
         if(err) {
