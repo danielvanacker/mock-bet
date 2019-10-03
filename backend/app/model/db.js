@@ -2,7 +2,6 @@
 require("dotenv").config();
 
 const dbPw = process.env.DB_PW;
-console.log(dbPw);
 
 var mysql = require('mysql');
 
