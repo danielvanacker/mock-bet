@@ -1,6 +1,8 @@
 # mock-bet
-A mock betting platform.
+A mock sports betting platform.
+Currently scrapes MLB games from the web.
 First bet to be implemented is moneyline MLB.
+
 Frontend
 -React.js
 Backend
