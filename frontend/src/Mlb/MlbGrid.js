@@ -4,6 +4,8 @@ import axios from 'axios';
 import auth0Client from '../Auth';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-balham.css';
+import DateSelector from '../DateSelector/DateSelector';
+
 
 // A grid to display mlb games. In future maybe bets below the games.
 class MlbGrid extends Component {
@@ -11,29 +13,60 @@ class MlbGrid extends Component {
         super(props);
         
         this.state = {
-            columnDefs: [{
-                headerName: "Date", field: "start_date"
-            }, {
-                headerName: "Home Team", field: "home"
-            }, {
-                headerName: "Away Team", field: "away"
-            }, {
-                headerName: "Runs (Home)", field: "home_runs"
-            }, {
-                headerName: "Runs (Away)", field: "away_runs"
-            }],
-            rowData: null
+            gridOptions: {
+                columnDefs: [{
+                    headerName: "Date", field: "start_date"
+                }, {
+                    headerName: "Home Team", field: "home"
+                }, {
+                    headerName: "Away Team", field: "away"
+                }, {
+                    headerName: "Runs (Home)", field: "home_runs"
+                }, {
+                    headerName: "Runs (Away)", field: "away_runs"
+                }],
+                rowData: null,
+            },
+            start_date: '2019-10-14'
         }
     }
 
     async componentDidMount() {
-        // Gets games
-        const rowData = (await axios.get('http://localhost:8081/mlb/all-games/', {
-            headers: { 'Authorization': `Bearer ${auth0Client.getIdToken()}` }
-        })).data;
+        this.updateRowData();
+    }
+
+    async updateRowData() {
+        if(this.api) {
+            this.api.showLoadingOverlay();
+        }
+        console.log(this.state.start_date);
+        const rowData = (await axios.get('http://localhost:8081/mlb/games/', {
+            headers: { 'Authorization': `Bearer ${auth0Client.getIdToken()}` },
+            params: { 'start_date': this.state.start_date }
+        })).data.games;
         this.setState({
             rowData,
         });
+        if(!this.api) return;
+        if(rowData.length < 1) {
+            this.api.showNoRowsOverlay();
+            return;
+        }
+        this.api.hideOverlay();
+    }
+
+    updateStartDate = newDate => {
+        this.setState(
+            {
+                start_date: newDate
+            },
+            this.updateRowData
+        );
+    }
+
+    ongridReady = params => {
+        this.api = params.api;
+        this.columnsApi = params.columnApi;
     }
 
     render() {
@@ -45,10 +78,13 @@ class MlbGrid extends Component {
                     width: '800px'
                 }}
             >
+                <DateSelector updateStartDate = {this.updateStartDate}/>
                 <AgGridReact
-                    columnDefs={this.state.columnDefs}
-                    rowData={this.state.rowData}>
+                    gridOptions={this.state.gridOptions}
+                    rowData={this.state.rowData}
+                    onGridReady={this.ongridReady}>
                 </AgGridReact>
+                <p>{this.state.start_date}</p>
             </div>
         );
     }

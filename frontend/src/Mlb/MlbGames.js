@@ -27,7 +27,7 @@ class MlbGames extends Component {
         return (
             <div className="container">
                 <div className="row">
-                    <MlbGrid></MlbGrid>
+                    <MlbGrid start_date="2019-09-16"></MlbGrid>
                 </div>
             </div>
         );

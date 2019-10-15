@@ -11,7 +11,7 @@ class App extends Component {
       <div>
         <NavBar/>
         <Route exact path='/mlb' component={MlbGames}/>
-        <Route exact path='/' component={Bets}/>
+        <Route exact path='/' component={MlbGames}/>
         <Route exact path='/callback' component={Callback}/>
       </div>
     );
