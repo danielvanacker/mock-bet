@@ -7,5 +7,5 @@ Backend
 -Express
 -MySQL
 
-Run nodemon start to start the backend.
+Run 'nodemon start' to start the backend.
 Run 'npm start' for the frontend.
