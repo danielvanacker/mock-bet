@@ -47,11 +47,34 @@ class MlbGrid extends Component {
             rowData,
         });
         if(!this.api) return;
+        if(!rowData) {
+            this.api.showNoRowsOverlay();
+            return;
+        }
         if(rowData.length < 1) {
             this.api.showNoRowsOverlay();
             return;
         }
         this.api.hideOverlay();
+    }
+
+    async updateScore() {
+        let currentDate = new Date()
+        console.log(currentDate);
+        let stateDate = new Date(this.state.start_date)
+        console.log(stateDate)
+        currentDate = currentDate.getFullYear()*10 + currentDate.getMonth()*10 + currentDate.getDate();
+        stateDate = stateDate.getFullYear()*10 + stateDate.getMonth()*10 + stateDate.getDate();
+
+        if (currentDate - stateDate <= 0 ) {
+            alert("You can only check scores for games that have passed.");
+            return;
+        }
+        console.log(`Today: ${currentDate}, In state: ${stateDate}`);
+        await axios.get('http://localhost:8081/mlb/update-score/', {
+            params: { 'start_date': this.state.start_date }
+        });
+        this.updateRowData();
     }
 
     updateStartDate = newDate => {
@@ -78,6 +101,7 @@ class MlbGrid extends Component {
                 }}
             >
                 <DateSelector updateStartDate = {this.updateStartDate}/>
+                <button onClick={this.updateScore.bind(this)}>Refresh Scores</button>
                 <AgGridReact
                     gridOptions={this.state.gridOptions}
                     rowData={this.state.rowData}

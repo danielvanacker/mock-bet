@@ -5,13 +5,6 @@ var ScheduleCheck = require('../model/scheduleModel');
 const scraper = require('../scrapers/mlbScheduleScraper');
 const scoreScraper = require('../scrapers/mlbScoreScraper');
 
-function isDateBeforeToday(date) {
-    console.log(date);
-    let dateSplit = date.split("-");
-    let formattedDate = new Date(dateSplit[0], dateSplit[1], dateSplit[2]);
-    return new Date(formattedDate.toDateString()) < new Date(new Date().toDateString());
-}
-
 exports.list_all_games = (req, res) => {
     MlbGame.getAllGames((err, games) => {
         if(err) {
@@ -29,37 +22,33 @@ exports.update_scores = (req, res) => {
 
     var start_date = req.query.start_date;
 
-    if (isDateBeforeToday(start_date)) {
-        scoreScraper(start_date).then(function(gameList) {
-            gameList.map((game) => {
-                const {date, win, winScore, lose, loseScore} = game;
-                MlbGame.getGameByHomeAbrev(date, win, (err, res) => {
-                    if(res.length < 1) {
-                        MlbGame.getGameByHomeAbrev(date, lose, (err, res) => {
-                            const [{cbs_schedule_abrev, start_date, home, away}] = res;
-                            MlbGame.setGameScore(start_date, home, loseScore, away, winScore, (err, res) => {
-                                if(err) {
-                                    // Handle Error
-                                }
-                            });
-                        });
-                    }
-                    else {
+    scoreScraper(start_date).then(function(gameList) {
+        gameList.map((game) => {
+            console.log(game);
+            const {date, win, winScore, lose, loseScore} = game;
+            MlbGame.getGameByHomeAbrev(date, win, (err, res) => {
+                if(res.length < 1) {
+                    MlbGame.getGameByHomeAbrev(date, lose, (err, res) => {
                         const [{cbs_schedule_abrev, start_date, home, away}] = res;
-                        MlbGame.setGameScore(start_date, home, winScore, away, loseScore, (err, res) => {
+                        MlbGame.setGameScore(start_date, home, loseScore, away, winScore, (err, res) => {
                             if(err) {
                                 // Handle Error
                             }
                         });
-                    }
-                });
+                    });
+                }
+                else {
+                    const [{cbs_schedule_abrev, start_date, home, away}] = res;
+                    MlbGame.setGameScore(start_date, home, winScore, away, loseScore, (err, res) => {
+                        if(err) {
+                            // Handle Error
+                        }
+                    });
+                }
             });
-            res.send({ error: false, message: 'Scores have been updated' });
         });
-    }
-    else {
-        res.send({ error: false, message: 'Date has not passed yet.' });
-    }
+        res.send({ error: false, message: 'Scores have been updated' });
+    });
 }
 
 // List all games on a certain date.

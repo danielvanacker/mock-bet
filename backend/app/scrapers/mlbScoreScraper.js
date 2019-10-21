@@ -11,14 +11,17 @@ const mlbScoreScraper = (date) => {
         var scoreList = []
         $('tbody > tr', html).map((index, row) => {
             var game = $('.CellGame', row).text().trim().split(/[\s-]+/);
-            var score = {
-                date: date,
-                win: game[0],
-                winScore: game[1],
-                lose: game[2],
-                loseScore: game[3]
-            };
-            scoreList.push(score);
+            
+            if (game[1]!=null) {
+                var score = {
+                    date: date,
+                    win: game[0],
+                    winScore: game[1],
+                    lose: game[2],
+                    loseScore: game[3]
+                };
+                scoreList.push(score);
+            }
             
             
         });
