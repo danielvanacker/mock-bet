@@ -39,7 +39,6 @@ class MlbGrid extends Component {
         if(this.api) {
             this.api.showLoadingOverlay();
         }
-        console.log(this.state.start_date);
         const rowData = (await axios.get('http://localhost:8081/mlb/games/', {
             headers: { 'Authorization': `Bearer ${auth0Client.getIdToken()}` },
             params: { 'start_date': this.state.start_date }

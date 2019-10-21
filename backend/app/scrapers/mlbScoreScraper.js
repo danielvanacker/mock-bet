@@ -1,34 +1,39 @@
-// const baseUrl = 'https://www.cbssports.com/mlb/schedule/';
-// const mlbGame = require('../model/mlbModel')
-// const rp = require('request-promise');
-// const $ = require('cheerio');
+const baseUrl = 'https://www.cbssports.com/mlb/schedule/';
+const mlbGame = require('../model/mlbGameModel')
+const rp = require('request-promise');
+const $ = require('cheerio');
 
-// const mlbScoreScraper = (date) => {
-//     const newDate = formatDate(date);
-//     console.log(baseUrl + newDate);
-//     return rp(baseUrl + newDate)
-//     .then(function(html) {
-//         var gameList = []
-//         $('tbody > tr', html).map((index, row) => {
-//             var awayTeam = $(':first-child > span > .TeamName > a', row).html();
-//             var temp = $(':first-child', row).siblings().html();
-//             var homeTeam = $('span > .TeamName > a', temp).text();
-//             var game = new mlbGame({home: homeTeam, away: awayTeam, start_date: date})
-//             gameList.push(game);
+const mlbScoreScraper = (date) => {
+    const newDate = formatDate(date);
+    console.log(baseUrl + newDate);
+    return rp(baseUrl + newDate)
+    .then(function(html) {
+        var scoreList = []
+        $('tbody > tr', html).map((index, row) => {
+            var game = $('.CellGame', row).text().trim().split(/[\s-]+/);
+            var score = {
+                date: date,
+                win: game[0],
+                winScore: game[1],
+                lose: game[2],
+                loseScore: game[3]
+            };
+            scoreList.push(score);
             
-//         });
-//         return gameList;
-//     })
-//     .catch(function(err) {
-//         console.error(err);
-//     });
-// }
+            
+        });
+        return scoreList;
+    })
+    .catch(function(err) {
+        console.error(err);
+    });
+}
 
-// const formatDate = (date) => {
-//     date = date.replace('-', '');
-//     date = date.replace('-', '');
-//     date = date + '/';
-//     return date;
-// }
+const formatDate = (date) => {
+    date = date.replace('-', '');
+    date = date.replace('-', '');
+    date = date + '/';
+    return date;
+}
 
-// module.exports = mlbScoreScraper;
+module.exports = mlbScoreScraper;

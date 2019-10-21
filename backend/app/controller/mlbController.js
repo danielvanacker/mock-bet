@@ -3,6 +3,14 @@
 var MlbGame = require('../model/mlbGameModel');
 var ScheduleCheck = require('../model/scheduleModel');
 const scraper = require('../scrapers/mlbScheduleScraper');
+const scoreScraper = require('../scrapers/mlbScoreScraper');
+
+function isDateBeforeToday(date) {
+    console.log(date);
+    let dateSplit = date.split("-");
+    let formattedDate = new Date(dateSplit[0], dateSplit[1], dateSplit[2]);
+    return new Date(formattedDate.toDateString()) < new Date(new Date().toDateString());
+}
 
 exports.list_all_games = (req, res) => {
     MlbGame.getAllGames((err, games) => {
@@ -13,9 +21,45 @@ exports.list_all_games = (req, res) => {
     });
 };
 
-// Update the scores of the games.
+// Update the scores of the games. Must have games in the database for a date before calling
 exports.update_scores = (req, res) => {
-    res.send({ error: false, message: 'TODO: Implement the update mlb scores route' })
+    if (!req.query.start_date) {
+        res.status(400).send({ error: true, message: 'Please provide start_date in the format YYYY-MM-DD.' });
+    } 
+
+    var start_date = req.query.start_date;
+
+    if (isDateBeforeToday(start_date)) {
+        scoreScraper(start_date).then(function(gameList) {
+            gameList.map((game) => {
+                const {date, win, winScore, lose, loseScore} = game;
+                MlbGame.getGameByHomeAbrev(date, win, (err, res) => {
+                    if(res.length < 1) {
+                        MlbGame.getGameByHomeAbrev(date, lose, (err, res) => {
+                            const [{cbs_schedule_abrev, start_date, home, away}] = res;
+                            MlbGame.setGameScore(start_date, home, loseScore, away, winScore, (err, res) => {
+                                if(err) {
+                                    // Handle Error
+                                }
+                            });
+                        });
+                    }
+                    else {
+                        const [{cbs_schedule_abrev, start_date, home, away}] = res;
+                        MlbGame.setGameScore(start_date, home, winScore, away, loseScore, (err, res) => {
+                            if(err) {
+                                // Handle Error
+                            }
+                        });
+                    }
+                });
+            });
+            res.send({ error: false, message: 'Scores have been updated' });
+        });
+    }
+    else {
+        res.send({ error: false, message: 'Date has not passed yet.' });
+    }
 }
 
 // List all games on a certain date.
@@ -39,6 +83,7 @@ exports.list_games_by_date = (req, res) => {
             else if (isGames.length < 1) {
                 // Scrape the web for MLB games
                 scraper(start_date).then(function(gameList) {
+                    console.log(gameList);
                     if(gameList.length > 0) {
                         gameList.forEach((game, index) => {
                             MlbGame.createGame(game, (err, gameId) => {
@@ -53,6 +98,16 @@ exports.list_games_by_date = (req, res) => {
                             }
                         });
                     }
+                    else {
+                        ScheduleCheck.createDate({ date: start_date, mlb: 0 }, (err, dateId) => {
+                            if(err) {
+                                // TODO handle error
+                            }
+                        });
+                    }
+
+                    
+
                     MlbGame.getGamesByDate(start_date, (err, games) => {
                         if(err) {
                             res.send(err);
@@ -60,21 +115,24 @@ exports.list_games_by_date = (req, res) => {
                         res.send({message: 'Sending Games after first addition', games: games});
                     });
                 });
-            }
 
-            // There are no MLB games on this date.
-            else if (isGames.mlb == 0) {
-                res.send( {error: false, message: 'No games for this date' });
             }
-
-            // Return the MLB games for that date.
             else {
-                MlbGame.getGamesByDate(start_date, (err, games) => {
-                    if(err) {
-                        res.send(err);
-                    }
-                    res.send({message: 'Sending Games', games: games});
-                });
+                const [{mlb}] = isGames;
+                // There are no MLB games on this date.
+                if (mlb == 0) {
+                    res.send( {error: false, message: 'No games for this date' });
+                }
+
+                // Return the MLB games for that date.
+                else {
+                    MlbGame.getGamesByDate(start_date, (err, games) => {
+                        if(err) {
+                            res.send(err);
+                        }
+                        res.send({message: 'Sending Games', games: games});
+                    });
+                }
             }
         })
     }

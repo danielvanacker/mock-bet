@@ -40,6 +40,7 @@ module.exports = (app) => {
         .get(mlbGames.list_all_games);
 
     app.route('/mlb/games')
+        .put(checkJwt, mlbGames.update_scores)
         .get(checkJwt, mlbGames.list_games_by_date)
         .post(checkJwt, mlbGames.create_a_game);
 };
